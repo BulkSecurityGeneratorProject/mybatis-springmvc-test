@@ -1,0 +1,20 @@
+{
+  "generator-jhipster": {
+    "baseName": "ircs",
+    "packageName": "cn.com.sinosoft.platform.ircs",
+    "packageFolder": "cn/com/sinosoft/platform/ircs",
+    "authenticationType": "xauth",
+    "hibernateCache": "ehcache",
+    "clusteredHttpSession": "no",
+    "websocket": "spring-websocket",
+    "databaseType": "sql",
+    "devDatabaseType": "mysql",
+    "prodDatabaseType": "mysql",
+    "searchEngine": "no",
+    "useCompass": false,
+    "buildTool": "maven",
+    "frontendBuilder": "grunt",
+    "javaVersion": "7",
+    "rememberMeKey": "4dd51d45c7e7fc019d6d5d854f679ac5f363cf2b"
+  }
+}
