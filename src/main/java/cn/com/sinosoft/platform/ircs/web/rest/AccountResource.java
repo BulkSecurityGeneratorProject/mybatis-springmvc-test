@@ -1,27 +1,33 @@
 package cn.com.sinosoft.platform.ircs.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import cn.com.sinosoft.platform.ircs.domain.Authority;
-import cn.com.sinosoft.platform.ircs.domain.User;
-import cn.com.sinosoft.platform.ircs.repository.UserRepository;
-import cn.com.sinosoft.platform.ircs.security.SecurityUtils;
-import cn.com.sinosoft.platform.ircs.service.MailService;
-import cn.com.sinosoft.platform.ircs.service.UserService;
-import cn.com.sinosoft.platform.ircs.web.rest.dto.UserDTO;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.*;
+import cn.com.sinosoft.platform.ircs.dao.UserDao;
+import cn.com.sinosoft.platform.ircs.domain.Authority;
+import cn.com.sinosoft.platform.ircs.domain.User;
+import cn.com.sinosoft.platform.ircs.security.SecurityUtils;
+import cn.com.sinosoft.platform.ircs.service.MailService;
+import cn.com.sinosoft.platform.ircs.service.UserService;
+import cn.com.sinosoft.platform.ircs.web.rest.dto.UserDTO;
+
+import com.codahale.metrics.annotation.Timed;
 
 /**
  * REST controller for managing the current user's account.
@@ -33,7 +39,7 @@ public class AccountResource {
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);
 
     @Inject
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Inject
     private UserService userService;
@@ -49,11 +55,11 @@ public class AccountResource {
             produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
     public ResponseEntity<?> registerAccount(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
-        User user = userRepository.findOneByLogin(userDTO.getLogin());
+        User user = userDao.findOneByLogin(userDTO.getLogin());
         if (user != null) {
             return ResponseEntity.badRequest().contentType(MediaType.TEXT_PLAIN).body("login already in use");
         } else {
-            if (userRepository.findOneByEmail(userDTO.getEmail()) != null) {
+            if (userDao.findOneByEmail(userDTO.getEmail()) != null) {
                 return ResponseEntity.badRequest().contentType(MediaType.TEXT_PLAIN).body("e-mail address already in use");
             }
             user = userService.createUserInformation(userDTO.getLogin(), userDTO.getPassword(),
@@ -132,7 +138,7 @@ public class AccountResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<String> saveAccount(@RequestBody UserDTO userDTO) {
-        User userHavingThisLogin = userRepository.findOneByLogin(userDTO.getLogin());
+        User userHavingThisLogin = userDao.findOneByLogin(userDTO.getLogin());
         if (userHavingThisLogin != null && !userHavingThisLogin.getLogin().equals(SecurityUtils.getCurrentLogin())) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

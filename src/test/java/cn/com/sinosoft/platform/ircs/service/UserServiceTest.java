@@ -1,22 +1,23 @@
 package cn.com.sinosoft.platform.ircs.service;
 
-import cn.com.sinosoft.platform.ircs.Application;
-import cn.com.sinosoft.platform.ircs.domain.User;
-import cn.com.sinosoft.platform.ircs.repository.UserRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
+import cn.com.sinosoft.platform.ircs.Application;
+import cn.com.sinosoft.platform.ircs.dao.UserDao;
+import cn.com.sinosoft.platform.ircs.domain.User;
 
 /**
  * Test class for the UserResource REST controller.
@@ -31,7 +32,7 @@ import static org.assertj.core.api.Assertions.*;
 public class UserServiceTest {
 
     @Inject
-    private UserRepository userRepository;
+    private UserDao userRepository;
 
     @Inject
     private UserService userService;

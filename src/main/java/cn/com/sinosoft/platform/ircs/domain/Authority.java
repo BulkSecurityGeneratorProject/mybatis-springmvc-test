@@ -1,29 +1,22 @@
 package cn.com.sinosoft.platform.ircs.domain;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 
 /**
  * An authority (a security role) used by Spring Security.
  */
-@Entity
-@Table(name = "JHI_AUTHORITY")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Authority implements Serializable {
 
     @NotNull
     @Size(min = 0, max = 50)
-    @Id
-    @Column(length = 50)
     private String name;
-
+    
+    private String desc;
+    
+    
     public String getName() {
         return name;
     }
@@ -32,7 +25,7 @@ public class Authority implements Serializable {
         this.name = name;
     }
 
-    @Override
+	@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -61,4 +54,15 @@ public class Authority implements Serializable {
                 "name='" + name + '\'' +
                 "}";
     }
+    
+
+    
+    public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
 }

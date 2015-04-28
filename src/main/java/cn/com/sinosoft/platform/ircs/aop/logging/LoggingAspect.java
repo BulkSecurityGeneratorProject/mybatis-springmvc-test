@@ -25,7 +25,7 @@ public class LoggingAspect {
     @Inject
     private Environment env;
 
-    @Pointcut("within(cn.com.sinosoft.platform.ircs.repository..*) || within(cn.com.sinosoft.platform.ircs.service..*) || within(cn.com.sinosoft.platform.ircs.web.rest..*)")
+    @Pointcut("within(cn.com.sinosoft.platform.ircs.dao..*) || within(cn.com.sinosoft.platform.ircs.service..*) || within(cn.com.sinosoft.platform.ircs.web.rest..*)")
     public void loggingPointcut() {}
 
     @AfterThrowing(pointcut = "loggingPointcut()", throwing = "e")

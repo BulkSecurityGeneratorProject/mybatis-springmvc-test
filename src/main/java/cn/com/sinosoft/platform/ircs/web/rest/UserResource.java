@@ -1,9 +1,10 @@
 package cn.com.sinosoft.platform.ircs.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import cn.com.sinosoft.platform.ircs.domain.User;
-import cn.com.sinosoft.platform.ircs.repository.UserRepository;
-import cn.com.sinosoft.platform.ircs.security.AuthoritiesConstants;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -12,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
+import cn.com.sinosoft.platform.ircs.dao.UserDao;
+import cn.com.sinosoft.platform.ircs.domain.User;
+
+import com.codahale.metrics.annotation.Timed;
 
 /**
  * REST controller for managing users.
@@ -26,7 +28,7 @@ public class UserResource {
     private final Logger log = LoggerFactory.getLogger(UserResource.class);
 
     @Inject
-    private UserRepository userRepository;
+    private UserDao userRepository;
 
     /**
      * GET  /users -> get all users.
@@ -37,7 +39,8 @@ public class UserResource {
     @Timed
     public List<User> getAll() {
         log.debug("REST request to get all Users");
-        return userRepository.findAll();
+     //   return userRepository.findAll();
+        return null;
     }
 
     /**

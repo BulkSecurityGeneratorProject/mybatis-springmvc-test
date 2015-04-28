@@ -1,13 +1,12 @@
 package cn.com.sinosoft.platform.ircs.service;
 
-import cn.com.sinosoft.platform.ircs.domain.Authority;
-import cn.com.sinosoft.platform.ircs.domain.User;
-import cn.com.sinosoft.platform.ircs.repository.AuthorityRepository;
-import cn.com.sinosoft.platform.ircs.repository.UserRepository;
-import cn.com.sinosoft.platform.ircs.security.SecurityUtils;
-import cn.com.sinosoft.platform.ircs.service.util.RandomUtil;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,10 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import cn.com.sinosoft.platform.ircs.dao.AuthorityDao;
+import cn.com.sinosoft.platform.ircs.dao.UserDao;
+import cn.com.sinosoft.platform.ircs.domain.Authority;
+import cn.com.sinosoft.platform.ircs.domain.User;
+import cn.com.sinosoft.platform.ircs.security.SecurityUtils;
+import cn.com.sinosoft.platform.ircs.service.util.RandomUtil;
 
 /**
  * Service class for managing users.
@@ -33,19 +34,19 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Inject
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Inject
-    private AuthorityRepository authorityRepository;
+    private AuthorityDao authorityDao;
 
     public  User activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
-        User user = userRepository.findOneByActivationKey(key);
+        User user = userDao.findOneByActivationKey(key);
         // activate given user for the registration key.
         if (user != null) {
             user.setActivated(true);
             user.setActivationKey(null);
-            userRepository.save(user);
+            userDao.save(user);
             log.debug("Activated user: {}", user);
         }
         return user;
@@ -54,7 +55,7 @@ public class UserService {
     public User createUserInformation(String login, String password, String firstName, String lastName, String email,
                                       String langKey) {
         User newUser = new User();
-        Authority authority = authorityRepository.findOne("ROLE_USER");
+        Authority authority = authorityDao.findOne("ROLE_USER");
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(login);
@@ -70,31 +71,31 @@ public class UserService {
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         authorities.add(authority);
         newUser.setAuthorities(authorities);
-        userRepository.save(newUser);
+		userDao.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
 
     public void updateUserInformation(String firstName, String lastName, String email) {
-        User currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentLogin());
+        User currentUser = userDao.findOneByLogin(SecurityUtils.getCurrentLogin());
         currentUser.setFirstName(firstName);
         currentUser.setLastName(lastName);
         currentUser.setEmail(email);
-        userRepository.save(currentUser);
+        userDao.save(currentUser);
         log.debug("Changed Information for User: {}", currentUser);
     }
 
     public void changePassword(String password) {
-        User currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentLogin());
+        User currentUser = userDao.findOneByLogin(SecurityUtils.getCurrentLogin());
         String encryptedPassword = passwordEncoder.encode(password);
         currentUser.setPassword(encryptedPassword);
-        userRepository.save(currentUser);
+        userDao.save(currentUser);
         log.debug("Changed password for User: {}", currentUser);
     }
 
     @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
-        User currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentLogin());
+        User currentUser = userDao.findOneByLogin(SecurityUtils.getCurrentLogin());
         currentUser.getAuthorities().size(); // eagerly load the association
         return currentUser;
     }
@@ -109,10 +110,10 @@ public class UserService {
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         DateTime now = new DateTime();
-        List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
+        List<User> users = userDao.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
         for (User user : users) {
             log.debug("Deleting not activated user {}", user.getLogin());
-            userRepository.delete(user);
+            userDao.delete(user);
         }
     }
 }

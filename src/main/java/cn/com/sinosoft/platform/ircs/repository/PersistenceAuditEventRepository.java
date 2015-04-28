@@ -1,15 +1,15 @@
 package cn.com.sinosoft.platform.ircs.repository;
 
-import cn.com.sinosoft.platform.ircs.domain.PersistentAuditEvent;
-import org.joda.time.LocalDateTime;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+
+import org.joda.time.LocalDateTime;
+
+import cn.com.sinosoft.platform.ircs.domain.PersistentAuditEvent;
 
 /**
  * Spring Data JPA repository for the PersistentAuditEvent entity.
  */
-public interface PersistenceAuditEventRepository extends JpaRepository<PersistentAuditEvent, String> {
+public interface PersistenceAuditEventRepository /* extends JpaRepository<PersistentAuditEvent, String> */{
 
     List<PersistentAuditEvent> findByPrincipal(String principal);
 

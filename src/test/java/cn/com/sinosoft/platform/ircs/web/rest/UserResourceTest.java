@@ -1,7 +1,12 @@
 package cn.com.sinosoft.platform.ircs.web.rest;
 
-import cn.com.sinosoft.platform.ircs.Application;
-import cn.com.sinosoft.platform.ircs.repository.UserRepository;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,10 +19,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.inject.Inject;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import cn.com.sinosoft.platform.ircs.Application;
+import cn.com.sinosoft.platform.ircs.dao.UserDao;
 
 /**
  * Test class for the UserResource REST controller.
@@ -31,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserResourceTest {
 
     @Inject
-    private UserRepository userRepository;
+    private UserDao userRepository;
 
     private MockMvc restUserMockMvc;
 

@@ -1,14 +1,23 @@
 package cn.com.sinosoft.platform.ircs.web.rest;
 
-import cn.com.sinosoft.platform.ircs.Application;
-import cn.com.sinosoft.platform.ircs.domain.Authority;
-import cn.com.sinosoft.platform.ircs.domain.User;
-import cn.com.sinosoft.platform.ircs.repository.AuthorityRepository;
-import cn.com.sinosoft.platform.ircs.repository.UserRepository;
-import cn.com.sinosoft.platform.ircs.security.AuthoritiesConstants;
-import cn.com.sinosoft.platform.ircs.service.MailService;
-import cn.com.sinosoft.platform.ircs.service.UserService;
-import cn.com.sinosoft.platform.ircs.web.rest.dto.UserDTO;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,20 +34,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import cn.com.sinosoft.platform.ircs.Application;
+import cn.com.sinosoft.platform.ircs.dao.AuthorityDao;
+import cn.com.sinosoft.platform.ircs.dao.UserDao;
+import cn.com.sinosoft.platform.ircs.domain.Authority;
+import cn.com.sinosoft.platform.ircs.domain.User;
+import cn.com.sinosoft.platform.ircs.security.AuthoritiesConstants;
+import cn.com.sinosoft.platform.ircs.service.MailService;
+import cn.com.sinosoft.platform.ircs.service.UserService;
+import cn.com.sinosoft.platform.ircs.web.rest.dto.UserDTO;
 
 /**
  * Test class for the AccountResource REST controller.
@@ -52,10 +56,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AccountResourceTest {
 
     @Inject
-    private UserRepository userRepository;
+    private UserDao userDao;
 
     @Inject
-    private AuthorityRepository authorityRepository;
+    private AuthorityDao authorityDao;
 
     @Inject
     private UserService userService;
@@ -76,12 +80,12 @@ public class AccountResourceTest {
         doNothing().when(mockMailService).sendActivationEmail((User) anyObject(), anyString());
 
         AccountResource accountResource = new AccountResource();
-        ReflectionTestUtils.setField(accountResource, "userRepository", userRepository);
+        ReflectionTestUtils.setField(accountResource, "userRepository", userDao);
         ReflectionTestUtils.setField(accountResource, "userService", userService);
         ReflectionTestUtils.setField(accountResource, "mailService", mockMailService);
 
         AccountResource accountUserMockResource = new AccountResource();
-        ReflectionTestUtils.setField(accountUserMockResource, "userRepository", userRepository);
+        ReflectionTestUtils.setField(accountUserMockResource, "userRepository", userDao);
         ReflectionTestUtils.setField(accountUserMockResource, "userService", mockUserService);
         ReflectionTestUtils.setField(accountUserMockResource, "mailService", mockMailService);
 
@@ -165,7 +169,7 @@ public class AccountResourceTest {
                 .content(TestUtil.convertObjectToJsonBytes(u)))
             .andExpect(status().isCreated());
 
-        User user = userRepository.findOneByLogin("joe");
+        User user = userDao.findOneByLogin("joe");
         assertThat(user).isNotNull();
     }
 
@@ -188,7 +192,7 @@ public class AccountResourceTest {
                 .content(TestUtil.convertObjectToJsonBytes(u)))
             .andExpect(status().isBadRequest());
 
-        User user = userRepository.findOneByEmail("funky@example.com");
+        User user = userDao.findOneByEmail("funky@example.com");
         assertThat(user).isNull();
     }
 
@@ -211,7 +215,7 @@ public class AccountResourceTest {
                 .content(TestUtil.convertObjectToJsonBytes(u)))
             .andExpect(status().isBadRequest());
 
-        User user = userRepository.findOneByLogin("bob");
+        User user = userDao.findOneByLogin("bob");
         assertThat(user).isNull();
     }
 
@@ -247,7 +251,7 @@ public class AccountResourceTest {
                 .content(TestUtil.convertObjectToJsonBytes(dup)))
             .andExpect(status().is4xxClientError());
 
-        User userDup = userRepository.findOneByEmail("alicejr@example.com");
+        User userDup = userDao.findOneByEmail("alicejr@example.com");
         assertThat(userDup).isNull();
     }
 
@@ -283,7 +287,7 @@ public class AccountResourceTest {
                 .content(TestUtil.convertObjectToJsonBytes(dup)))
             .andExpect(status().is4xxClientError());
 
-        User userDup = userRepository.findOneByLogin("johnjr");
+        User userDup = userDao.findOneByLogin("johnjr");
         assertThat(userDup).isNull();
     }
 
@@ -306,9 +310,9 @@ public class AccountResourceTest {
                 .content(TestUtil.convertObjectToJsonBytes(u)))
             .andExpect(status().isCreated());
 
-        User userDup = userRepository.findOneByLogin("badguy");
+        User userDup = userDao.findOneByLogin("badguy");
         assertThat(userDup).isNotNull();
         assertThat(userDup.getAuthorities()).hasSize(1)
-            .containsExactly(authorityRepository.findOne(AuthoritiesConstants.USER));
+            .containsExactly(authorityDao.findOne(AuthoritiesConstants.USER));
     }
 }

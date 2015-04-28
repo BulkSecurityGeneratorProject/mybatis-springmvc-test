@@ -1,15 +1,17 @@
 package cn.com.sinosoft.platform.ircs.service;
 
-import cn.com.sinosoft.platform.ircs.config.audit.AuditEventConverter;
-import cn.com.sinosoft.platform.ircs.domain.PersistentAuditEvent;
-import cn.com.sinosoft.platform.ircs.repository.PersistenceAuditEventRepository;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
 import org.joda.time.LocalDateTime;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.List;
+import cn.com.sinosoft.platform.ircs.config.audit.AuditEventConverter;
+import cn.com.sinosoft.platform.ircs.domain.PersistentAuditEvent;
+import cn.com.sinosoft.platform.ircs.repository.PersistenceAuditEventRepository;
 
 /**
  * Service for managing audit events.
@@ -22,14 +24,14 @@ import java.util.List;
 @Transactional
 public class AuditEventService {
 
-    @Inject
+    //@Inject
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @Inject
     private AuditEventConverter auditEventConverter;
 
     public List<AuditEvent> findAll() {
-        return auditEventConverter.convertToAuditEvent(persistenceAuditEventRepository.findAll());
+        return null;//FIXME: auditEventConverter.convertToAuditEvent(persistenceAuditEventRepository.findAll());
     }
 
     public List<AuditEvent> findByDates(LocalDateTime fromDate, LocalDateTime toDate) {
