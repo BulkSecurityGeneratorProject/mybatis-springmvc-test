@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
+import liquibase.integration.spring.SpringLiquibase;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -21,7 +23,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.StringUtils;
@@ -129,4 +130,24 @@ public class DatabaseConfiguration implements EnvironmentAware {
 		return new SqlSessionTemplate(sqlSessionFactory());
 	}
 
+	
+	@Bean
+    public SpringLiquibase liquibase(DataSource dataSource) {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:config/liquibase/master.xml");
+        liquibase.setContexts("development, production");
+        if (env.acceptsProfiles(Constants.SPRING_PROFILE_FAST)) {
+            if ("org.h2.jdbcx.JdbcDataSource".equals(propertyResolver.getProperty("dataSourceClassName"))) {
+                liquibase.setShouldRun(true);
+                log.warn("Using '{}' profile with H2 database in memory is not optimal, you should consider switching to" +
+                    " MySQL or Postgresql to avoid rebuilding your database upon each start.", Constants.SPRING_PROFILE_FAST);
+            } else {
+                liquibase.setShouldRun(false);
+            }
+        } else {
+            log.debug("Configuring Liquibase");
+        }
+        return liquibase;
+    }
 }
