@@ -22,6 +22,12 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         <collection property="authorities" ofType="list" resultMap="Authority"></collection>  
     </resultMap>
     
+    
+  
+      <select id="findOneByActivationKey" parameterType="String" resultMap="User">
+    	select u.*, a.* from JHI_USER u  left join JHI_USER_AUTHORITY ua on ua.user_id=u.id left join JHI_AUTHORITY a on a.`name`=ua.authority_name 
+    		where u.activation_key=#{_parameter}
+    </select>  
     <select id="findOneByLogin" parameterType="String" resultMap="User">
     	select u.*, a.* from JHI_USER u  left join JHI_USER_AUTHORITY ua on ua.user_id=u.id left join JHI_AUTHORITY a on a.`name`=ua.authority_name where u.login=#{_parameter}
     </select>

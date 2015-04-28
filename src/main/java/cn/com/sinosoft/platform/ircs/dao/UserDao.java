@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 import cn.com.sinosoft.platform.ircs.domain.User;
 
 public interface UserDao {
-	@Select("select * from JHI_USER u where u.activation_key=#{activationKey}")
+	//@Select("select * from JHI_USER u where u.activation_key=#{activationKey}")
 	User findOneByActivationKey(String activationKey);
 
 	@Select("select * from JHI_USER u where u.activated=0 and created_date < #{dateTime}")
