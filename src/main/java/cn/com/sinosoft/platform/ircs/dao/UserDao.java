@@ -24,7 +24,6 @@ public interface UserDao {
 	@Select("select * from JHI_USER u where u.email=#{email}")
 	User findOneByEmail(String email);
 
-	@Insert("INSERT INTO JHI_USER (login,password,first_name,last_name,email,activated,lang_key,activation_key,created_by,created_date,last_modified_by,last_modified_date) values(#{login},#{password},#{first_name},#{last_name},#{email},#{activated},#{lang_key},#{activation_key},#{created_by},#{created_date},#{last_modified_by},#{last_modified_date})")
 	void save(User user);
 	
 	@Delete("delete from JHI_USER where id=#{id}")

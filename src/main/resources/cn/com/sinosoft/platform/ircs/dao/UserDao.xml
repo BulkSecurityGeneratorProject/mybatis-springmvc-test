@@ -40,4 +40,15 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			u.login=#{_parameter}
 		</where>
 	</select>
+	<update id="save" parameterType="cn.com.sinosoft.platform.ircs.domain.User">
+		update JHI_USER 
+		<set>
+			<if test="password!=null">
+				password = #{password},
+			</if>
+		</set>
+		<where>
+			login=#{login}
+		</where>
+	</update>
 </mapper>  
