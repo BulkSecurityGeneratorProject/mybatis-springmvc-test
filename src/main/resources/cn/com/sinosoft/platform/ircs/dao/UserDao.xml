@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"    
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="cn.com.sinosoft.platform.ircs.dao.UserDao">
+
+	<resultMap id="Authority"
+		type="cn.com.sinosoft.platform.ircs.domain.Authority">
+		<id property="name" column="name" />
+		<result property="desc" column="desc" />
+	</resultMap>
+
+	<resultMap id="User" type="cn.com.sinosoft.platform.ircs.domain.User">
+		<id property="id" column="id" />
+		<result property="login" column="login" />
+		<result property="password" column="password" />
+		<result property="firstName" column="firstName" />
+		<result property="lastName" column="lastName" />
+		<result property="email" column="email" />
+		<result property="activated" column="activated" />
+		<result property="langKey" column="langKey" />
+		<result property="activationKey" column="activationKey" />
+		<collection property="authorities" ofType="list" resultMap="Authority"></collection>
+	</resultMap>
+
+	<select id="findOneByActivationKey" parameterType="String"
+		resultMap="User">
+		select u.*, a.* from JHI_USER u left join JHI_USER_AUTHORITY ua on
+		ua.user_id=u.id left join JHI_AUTHORITY a on
+		a.`name`=ua.authority_name
+		<where>
+			u.activation_key=#{_parameter}
+		</where>
+	</select>
+	<select id="findOneByLogin" parameterType="String" resultMap="User">
+		select u.*, a.* from JHI_USER u left join JHI_USER_AUTHORITY ua on
+		ua.user_id=u.id left join JHI_AUTHORITY a on
+		a.`name`=ua.authority_name
+		<where>
+			u.login=#{_parameter}
+		</where>
+	</select>
+</mapper>  

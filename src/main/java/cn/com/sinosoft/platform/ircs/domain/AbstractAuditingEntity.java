@@ -5,7 +5,6 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * last modified by date.
  */
 @MappedSuperclass
-@Audited
 public abstract class AbstractAuditingEntity {
 
     @CreatedBy
